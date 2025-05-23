@@ -1,15 +1,42 @@
-import eslintBaseConfig from './eslint.mjs';
+import baseConfig from './packages/config/eslint.mjs';
 
-export default {
-  ...eslintBaseConfig,
-  root: true,
-  parserOptions: {
-    ecmaFeatures: { 'jsx': true },
-    ecmaVersion: '2022',
-    sourceType: 'module',
-    tsconfigRootDir: process.cwd(), // __dirname не доступен в ES модулях
-    project: "./tsconfig.json",
+export default [
+  // Импортируем базовую конфигурацию
+  ...baseConfig,
+
+  // Переопределяем настройки для корневого проекта
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        },
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname, // или process.cwd() для Node.js < 20.11.0
+      },
+      globals: {
+        localStorage: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+      },
+    },
+    rules: {
+      // Дополнительные правила для корневого проекта
+      'no-alert': 'warn',
+    },
   },
-  ignorePatterns: ['.eslintrc.js'],
-};
 
+  // Игнорируемые файлы
+  {
+    ignores: [
+      'eslint.config.mjs',
+      'public/**',
+      'next.config.ts',
+    ],
+  },
+];

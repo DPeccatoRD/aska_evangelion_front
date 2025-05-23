@@ -1,42 +1,40 @@
 'use client';
 
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import ComputerIcon from '@mui/icons-material/Computer';
+import { IconButton, Tooltip } from '@mui/material';
 import { useTheme } from 'next-themes';
-import { useState, useEffect } from 'react';
-import styles from './themeToggle.module.css';
 
 export const ThemeToggle = () => {
-    const { theme, setTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-    // Предотвращаем гидратацию на стороне клиента
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  const themeSequence = {
+    light: 'dark',
+    dark: 'system',
+    system: 'light',
+  };
 
-    // Если компонент не смонтирован, рендерим пустое место того же размера
-    if (!mounted) {
-        return <div className={styles.placeholder} />;
-    }
+  const getTooltipText = () => {
+    if (theme === 'light') return 'Переключить на темную тему';
+    if (theme === 'dark') return 'Переключить на системную тему';
 
-    const toggleTheme = () => {
-        if (theme === 'light') {
-            setTheme('dark');
-        } else if (theme === 'dark') {
-            setTheme('system');
-        } else {
-            setTheme('light');
-        }
-    };
+    return 'Переключить на светлую тему';
+  };
 
-    return (
-        <button
-            onClick={toggleTheme}
-            className={styles.toggleButton}
-            aria-label="Переключить тему"
-        >
-            {theme === 'light' && <span className={styles.icon}>☀️</span>}
-            {theme === 'dark' && <span className={styles.icon}>🌙</span>}
-            {theme === 'system' && <span className={styles.icon}>💻</span>}
-        </button>
-    );
+  const toggleTheme = () => {
+    const nextTheme = themeSequence[theme as keyof typeof themeSequence] || 'light';
+    setTheme(nextTheme);
+  };
+
+  return (
+    <Tooltip title={getTooltipText()}>
+      <IconButton aria-label='Переключить тему' color='inherit' onClick={toggleTheme}>
+        {theme === 'light' && <Brightness7Icon />}
+        {theme === 'dark' && <Brightness4Icon />}
+        {theme === 'system' && <ComputerIcon />}
+        {theme === undefined && <Brightness7Icon />}
+      </IconButton>
+    </Tooltip>
+  );
 };
